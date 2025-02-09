@@ -11,10 +11,9 @@ const app = express();
 const proxy = httpProxy.createProxyServer({});
 const PORT = 3000;
 
-// 使用 morgan 中间件记录访问日志
+// 使用 morgan 紀錄 log
 app.use(morgan('combined', { stream: morganStream }));
 
-// 全局代理请求处理逻辑
 app.use(async (req, res) => {
   const cacheKey = req.url;
 
@@ -25,7 +24,7 @@ app.use(async (req, res) => {
       return res.status(403).send(message);
     }
 
-    // 檢查緩存
+    // 檢查 cache
     const cachedResponse = await cache.get(req.url);
     if (cachedResponse) {
       const originalUserAgent = req.headers['user-agent'] || 'Unknown User-Agent';
@@ -34,7 +33,7 @@ app.use(async (req, res) => {
       res.setHeader('Content-Type', cachedResponse.contentType);
 
       if (cachedResponse.contentType === 'text/html') {
-        res.setHeader('Content-Disposition', 'inline');  // 確保是內嵌顯示而不是下載
+        res.setHeader('Content-Disposition', 'inline');
       }
 
       res.end(cachedResponse.data);
